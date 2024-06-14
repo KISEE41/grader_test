@@ -1,0 +1,3 @@
+nbgrader
+loguru
+gitpython

@@ -1,0 +1,70 @@
+name: notebook_checker
+
+# on:
+#   push:
+#     branches: ["master"]
+#   pull_request:
+#     branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # runs-on: ${{ matrix.os }}
+    # strategy:
+    #   matrix:
+    #     os: [windows-latest, ubuntu-latest, macOS-latest]
+
+    steps:
+      # checkout the repository content to github runner
+      - name: Checkout Repo Content
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      # setting up python
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # Installing necessary dependencies specified in requirements.txt file
+      - name: Install dependencies
+        run: | 
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          pip install -r requirements.txt
+
+      # - name: Lint with flake8
+      #   run: |
+      #     # stop the build if there are Python syntax errors or undefined names
+      #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+      #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      # # Running pytest
+      # - name: Test with pytest
+      #   run: |
+      #     pytest main.py
+
+      # Changing the mode to execution for executing the main.py file
+      - name: Granting Execution Permission
+        run: chmod +x main.py
+
+      # Executing the python script
+      - name: Execute The Script
+        run: python main.py
+
+      # Generated logs and datas, and commit and push in github
+      - name: Commit Files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "updated logs, and uploaded datas" --allow-empty
+
+      # Pushing the changes
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
