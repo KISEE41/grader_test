@@ -38,6 +38,7 @@ def main():
     # Load the event data
     with open(github_event_path, 'r') as f:
         event_data = json.load(f)
+        logging.debug(event_data)
     
     # Extract the commits
     commits = event_data.get('commits', [])
