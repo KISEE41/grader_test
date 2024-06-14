@@ -24,9 +24,18 @@ jobs:
     - name: Run script to track added .ipynb files
       run: python track_ipynb_files.py
 
-    # Output the log file (optional, for debugging purposes)
-    - name: Upload logs
-      uses: actions/upload-artifact@v3
-      with:
-        name: logs
-        path: /home/runner/work/_temp/_github_home/logs
+    # Generated logs and datas, and commit and push in github
+      - name: Commit Files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "updated logs, and uploaded datas" --allow-empty
+
+      # Pushing the changes
+      - name: Push Changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
+
